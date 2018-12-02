@@ -81,15 +81,13 @@ func resourceModelVersionUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceModelVersionDelete(d *schema.ResourceData, m interface{}) error {
-	/*
-	d.SetId("")
 
 	client := m.(*apiclient.Client)
-	err := client.DeleteModelVersion(d.Id())
+	err := client.DeleteModelVersion(d.Get("model_id").(string), d.Id())
 	if err != nil {
 		return err
 	}
-	*/
+	d.SetId("")
 
 	return nil
 }

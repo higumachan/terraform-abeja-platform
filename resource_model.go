@@ -56,13 +56,14 @@ func resourceModelUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceModelDelete(d *schema.ResourceData, m interface{}) error {
-	d.SetId("")
 
 	client := m.(*apiclient.Client)
 	err := client.DeleteModel(d.Id())
 	if err != nil {
 		return err
 	}
+
+	d.SetId("")
 
 	return nil
 }

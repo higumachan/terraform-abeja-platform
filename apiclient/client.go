@@ -142,6 +142,11 @@ func (c *Client) CreateDeployment(modelId string, param *CreateDeploymentParam) 
 	return result, nil
 }
 
+func (c *Client) DeleteDeployment(deploymentId string) error {
+	_, err := c.DoRequest("DELETE", path.Join("deployments", deploymentId), nil)
+	return err
+}
+
 func (c *Client) NewRequest(method string, endpoint string, payload io.Reader) (*http.Request, error) {
 	u, err := c.GetUrl()
 	if err != nil {

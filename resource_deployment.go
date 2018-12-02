@@ -65,15 +65,13 @@ func resourceDeploymentUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceDeploymentDelete(d *schema.ResourceData, m interface{}) error {
-	/*
-	d.SetId("")
-
 	client := m.(*apiclient.Client)
 	err := client.DeleteDeployment(d.Id())
 	if err != nil {
 		return err
 	}
 
-	*/
+	d.SetId("")
+
 	return nil
 }

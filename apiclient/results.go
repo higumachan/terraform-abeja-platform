@@ -1,5 +1,5 @@
 package apiclient
 
-type CreateModelResult struct {
+type ModelResult struct {
 	ModelId	string	`json:"model_id"`
 }

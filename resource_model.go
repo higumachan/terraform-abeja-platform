@@ -41,6 +41,13 @@ func resourceModelCreate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceModelRead(d *schema.ResourceData, m interface{}) error {
+	client := m.(*apiclient.Client)
+
+	res, err := client.RetrieveModel(d.Id())
+	if err != nil {
+		return err
+	}
+	d.SetId(res.ModelId)
 	return nil
 }
 

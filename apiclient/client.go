@@ -12,7 +12,7 @@ import (
 	"os"
 	"fmt"
 	"bytes"
-	"mime/multipart"
+	"bufio"
 )
 
 type Client struct {
@@ -81,20 +81,16 @@ func (c *Client) CreateModelVersion(modelId string, uploadFilePath string, param
 	}
 
 	var buf bytes.Buffer
-
-	w := multipart.NewWriter(&buf)
+	w := bufio.NewWriter(&buf)
 
 	file, err := os.Open(uploadFilePath)
 	defer file.Close()
 
 	if err != nil {
+		c.DeleteModelVersion(modelId, result.VersionId)
 		return nil, err
 	}
-	fw, err := w.CreateFormFile("file", uploadFilePath)
-	if err != nil {
-		return nil, err
-	}
-	if _, err = io.Copy(fw, file); err != nil {
+	if _, err = io.Copy(w, file); err != nil {
 		return nil, err
 	}
 
@@ -102,16 +98,19 @@ func (c *Client) CreateModelVersion(modelId string, uploadFilePath string, param
 	url := result.UploadUrl
 	req, err := http.NewRequest(http.MethodPut, url, &buf)
 	if err != nil {
+		c.DeleteModelVersion(modelId, result.VersionId)
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/octet-stream")
 	res, err := http.DefaultClient.Do(req)
 
 	if err != nil {
+		c.DeleteModelVersion(modelId, result.VersionId)
 		return nil, err
 	}
 
 	if res.StatusCode != 200 {
+		c.DeleteModelVersion(modelId, result.VersionId)
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			return nil, err
@@ -144,6 +143,32 @@ func (c *Client) CreateDeployment(modelId string, param *CreateDeploymentParam) 
 
 func (c *Client) DeleteDeployment(deploymentId string) error {
 	_, err := c.DoRequest("DELETE", path.Join("deployments", deploymentId), nil)
+	return err
+}
+
+func (c *Client) CreateDeploymentService(deploymentId string, param *CreateDeploymentServiceParam) (*DeploymentServiceResult, error) {
+	// FIXME: 不定形なJSONをMarshalで扱う方法がわからなかったのでとりあえずSprintfで作る
+	payload := strings.NewReader(fmt.Sprintf(
+		`{"instance_number": %d, "instance_type": "%s", "environment": %s, "version_id": "%s"}`,
+		param.InstanceNumber,
+		param.InstanceType,
+		param.Environment,
+		param.VersionId,
+	))
+	body, err := c.DoRequest("POST", path.Join("deployments", deploymentId, "services"), payload)
+	if err != nil {
+		return nil, err
+	}
+	result := &DeploymentServiceResult{}
+	err = json.Unmarshal(body, result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (c *Client) DeleteDeploymentService(deploymentId, serviceId string) error {
+	_, err := c.DoRequest("DELETE", path.Join("deployments", deploymentId, "services", serviceId), nil)
 	return err
 }
 

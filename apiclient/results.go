@@ -10,5 +10,16 @@ type ModelVersionResult struct {
 }
 
 type DeploymentResult struct {
+	ModelId string `json:"model_id"`
 	DeploymentId string `json:"deployment_id"`
 }
+
+type DeploymentServiceResult struct {
+	ServiceId string `json:"service_id"`
+}
+
+type DeploymentEndpointResult struct {
+	EndpointId string `json:"endpoint_id"`
+	ServiceId string `json:"ServiceId"`
+}
+

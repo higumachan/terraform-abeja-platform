@@ -32,6 +32,7 @@ func Provider() *schema.Provider {
 			"abeja_model": resourceModel(),
 			"abeja_model_version": resourceModelVersion(),
 			"abeja_deployment": resourceDeployment(),
+			"abeja_deployment_service": resourceDeploymentService(),
 		},
 		ConfigureFunc: providerConfigure,
 	}

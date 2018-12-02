@@ -3,3 +3,4 @@ terraform.tfstate.backup
 terraform-provider-abeja
 .terraform
 .idea
+*.tfvars

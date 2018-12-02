@@ -1,6 +1,9 @@
 package main
 
-import "github.com/hashicorp/terraform/helper/schema"
+import (
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/higumachan/terraform-abeja-platform/apiclient"
+)
 
 func resourceModel() *schema.Resource {
 	return &schema.Resource{
@@ -23,8 +26,17 @@ func resourceModel() *schema.Resource {
 }
 
 func resourceModelCreate(d *schema.ResourceData, m interface{}) error {
+	client := m.(*apiclient.Client)
+
 	name := d.Get("name").(string)
-	d.SetId(name)
+	description := d.Get("description").(string)
+
+	res, err := client.CreateModel(name, description)
+	if err != nil {
+		return err
+	}
+
+	d.SetId(res.ModelId)
 	return resourceModelRead(d, m)
 }
 
@@ -33,12 +45,10 @@ func resourceModelRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceModelUpdate(d *schema.ResourceData, m interface{}) error {
-	d.Partial(true)
-
-
 	return resourceModelRead(d, m)
 }
 
 func resourceModelDelete(d *schema.ResourceData, m interface{}) error {
+	d.SetId("")
 	return nil
 }

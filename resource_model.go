@@ -31,7 +31,7 @@ func resourceModelCreate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	description := d.Get("description").(string)
 
-	res, err := client.CreateModel(name, description)
+	res, err := client.CreateModel(&apiclient.CreateModelParam{Name: name, Description: description})
 	if err != nil {
 		return err
 	}
@@ -57,5 +57,12 @@ func resourceModelUpdate(d *schema.ResourceData, m interface{}) error {
 
 func resourceModelDelete(d *schema.ResourceData, m interface{}) error {
 	d.SetId("")
+
+	client := m.(*apiclient.Client)
+	err := client.DeleteModel(d.Id())
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

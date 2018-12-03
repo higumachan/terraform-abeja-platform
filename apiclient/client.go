@@ -31,7 +31,7 @@ func (c *Client) CreateModel(param *CreateModelParam) (*ModelResult, error) {
 	payload := strings.NewReader(string(jsonBytes))
 
 	result := &ModelResult{}
-	err = c.DoRequest("POST", "models", payload, result)
+	err = c.doRequest("POST", "models", payload, result)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *Client) CreateModel(param *CreateModelParam) (*ModelResult, error) {
 
 func (c *Client) RetrieveModel(id string) (*ModelResult, error) {
 	result := &ModelResult{}
-	err := c.DoRequest("GET", path.Join("models", id), nil, result)
+	err := c.doRequest("GET", path.Join("models", id), nil, result)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (c *Client) RetrieveModel(id string) (*ModelResult, error) {
 }
 
 func (c *Client) DeleteModel(id string) error {
-	err := c.DoRequest("DELETE", path.Join("models", id), nil, &struct{}{})
+	err := c.doRequest("DELETE", path.Join("models", id), nil, &struct{}{})
 	return err
 }
 
@@ -59,7 +59,7 @@ func (c *Client) CreateModelVersion(modelId string, uploadFilePath string, param
 	payload := strings.NewReader(string(jsonBytes))
 
 	result := &ModelVersionResult{}
-	err = c.DoRequest("POST", path.Join("models", modelId, "versions"), payload, result)
+	err = c.doRequest("POST", path.Join("models", modelId, "versions"), payload, result)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (c *Client) CreateModelVersion(modelId string, uploadFilePath string, param
 }
 
 func (c *Client) DeleteModelVersion(modelId string, modelVersionId string) error {
-	err := c.DoRequest("DELETE", path.Join("models", modelId, "versions", modelVersionId), nil, &struct {}{})
+	err := c.doRequest("DELETE", path.Join("models", modelId, "versions", modelVersionId), nil, &struct {}{})
 	return err
 }
 
@@ -114,7 +114,7 @@ func (c *Client) CreateDeployment(modelId string, param *CreateDeploymentParam) 
 	// FIXME: 不定形なJSONをMarshalで扱う方法がわからなかったのでとりあえずSprintfで作る
 	payload := strings.NewReader(fmt.Sprintf(`{"name": "%s", "default_environment": %s}`, param.Name, param.DefaultEnvironment))
 	result := &DeploymentResult{}
-	err := c.DoRequest("POST", path.Join("models", modelId, "deployments"), payload, result)
+	err := c.doRequest("POST", path.Join("models", modelId, "deployments"), payload, result)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (c *Client) CreateDeployment(modelId string, param *CreateDeploymentParam) 
 }
 
 func (c *Client) DeleteDeployment(deploymentId string) error {
-	err := c.DoRequest("DELETE", path.Join("deployments", deploymentId), nil, &struct{}{})
+	err := c.doRequest("DELETE", path.Join("deployments", deploymentId), nil, &struct{}{})
 	return err
 }
 
@@ -136,7 +136,7 @@ func (c *Client) CreateDeploymentService(deploymentId string, param *CreateDeplo
 		param.VersionId,
 	))
 	result := &DeploymentServiceResult{}
-	err := c.DoRequest("POST", path.Join("deployments", deploymentId, "services"), payload, result)
+	err := c.doRequest("POST", path.Join("deployments", deploymentId, "services"), payload, result)
 	if err != nil {
 		return nil, err
 	}
@@ -144,11 +144,11 @@ func (c *Client) CreateDeploymentService(deploymentId string, param *CreateDeplo
 }
 
 func (c *Client) DeleteDeploymentService(deploymentId, serviceId string) error {
-	return c.DoRequest("DELETE", path.Join("deployments", deploymentId, "services", serviceId), nil, &struct{}{})
+	return c.doRequest("DELETE", path.Join("deployments", deploymentId, "services", serviceId), nil, &struct{}{})
 }
 
-func (c *Client) NewRequest(method string, endpoint string, payload io.Reader) (*http.Request, error) {
-	u, err := c.GetUrl()
+func (c *Client) newRequest(method string, endpoint string, payload io.Reader) (*http.Request, error) {
+	u, err := c.getUrl()
 	if err != nil {
 		return nil, err
 	}
@@ -169,8 +169,8 @@ func (c *Client) NewRequest(method string, endpoint string, payload io.Reader) (
 	return req, nil
 }
 
-func (c *Client) DoRequest(method string, endpoint string, payload io.Reader, result interface{}) error {
-	req, _ := c.NewRequest(
+func (c *Client) doRequest(method string, endpoint string, payload io.Reader, result interface{}) error {
+	req, _ := c.newRequest(
 		method,
 		endpoint,
 		payload,)
@@ -200,7 +200,7 @@ func (c *Client) DoRequest(method string, endpoint string, payload io.Reader, re
 	return nil
 }
 
-func (c *Client) GetUrl() (*url.URL, error) {
+func (c *Client) getUrl() (*url.URL, error) {
 	u, err := url.Parse("https://api.abeja.io")
 	if err != nil {
 		return nil, err

@@ -3,6 +3,7 @@ package abeja
 import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/higumachan/terraform-abeja-platform/apiclient"
+	"github.com/higumachan/terraform-abeja-platform/terraformschema"
 )
 
 func resourceModel() *schema.Resource {
@@ -28,10 +29,10 @@ func resourceModel() *schema.Resource {
 func resourceModelCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*apiclient.Client)
 
-	name := d.Get("name").(string)
-	description := d.Get("description").(string)
+	param := apiclient.CreateModelParam{}
+	terraformschema.Parse(d, &param)
 
-	res, err := client.CreateModel(&apiclient.CreateModelParam{Name: name, Description: description})
+	res, err := client.CreateModel(&param)
 	if err != nil {
 		return err
 	}

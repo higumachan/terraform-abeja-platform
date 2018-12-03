@@ -50,7 +50,7 @@ func (c *Client) RetrieveModel(id string) (*ModelResult, error) {
 }
 
 func (c *Client) DeleteModel(id string) error {
-	err := c.DoRequest("DELETE", path.Join("models", id), nil, struct{}{})
+	err := c.DoRequest("DELETE", path.Join("models", id), nil, &struct{}{})
 	return err
 }
 
@@ -106,7 +106,7 @@ func (c *Client) CreateModelVersion(modelId string, uploadFilePath string, param
 }
 
 func (c *Client) DeleteModelVersion(modelId string, modelVersionId string) error {
-	err := c.DoRequest("DELETE", path.Join("models", modelId, "versions", modelVersionId), nil, struct {}{})
+	err := c.DoRequest("DELETE", path.Join("models", modelId, "versions", modelVersionId), nil, &struct {}{})
 	return err
 }
 

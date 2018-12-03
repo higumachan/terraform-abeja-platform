@@ -3,6 +3,7 @@ package abeja
 import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/higumachan/terraform-abeja-platform/apiclient"
+	"github.com/higumachan/terraform-abeja-platform/terraformschema"
 )
 
 func resourceModelVersion() *schema.Resource {
@@ -48,11 +49,8 @@ func resourceModelVersionCreate(d *schema.ResourceData, m interface{}) error {
 	modelId := d.Get("model_id").(string)
 	uploadFilePath := d.Get("upload_file_path").(string)
 
-	var param apiclient.CreateModelVersionParam
-	param.Version = d.Get("version").(string)
-	param.Image = d.Get("image").(string)
-	param.Handler = d.Get("handler").(string)
-	param.ContentType = d.Get("content_type").(string)
+	param := apiclient.CreateModelVersionParam{}
+	terraformschema.Parse(d, &param)
 
 	res, err := client.CreateModelVersion(modelId, uploadFilePath, &param)
 	if err != nil {

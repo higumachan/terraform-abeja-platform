@@ -3,6 +3,7 @@ package abeja
 import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/higumachan/terraform-abeja-platform/apiclient"
+	"github.com/higumachan/terraform-abeja-platform/terraformschema"
 )
 
 func resourceDeploymentService() *schema.Resource {
@@ -40,13 +41,10 @@ func resourceDeploymentService() *schema.Resource {
 func resourceDeploymentServiceCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*apiclient.Client)
 
-	param := apiclient.CreateDeploymentServiceParam{}
 
 	deploymentId := d.Get("deployment_id").(string)
-	param.InstanceNumber = d.Get("instance_number").(int)
-	param.InstanceType = d.Get("instance_type").(string)
-	param.Environment = d.Get("environment").(string)
-	param.VersionId = d.Get("version_id").(string)
+	param := apiclient.CreateDeploymentServiceParam{}
+	terraformschema.Parse(d, &param)
 
 	res, err := client.CreateDeploymentService(deploymentId, &param)
 	if err != nil {

@@ -3,6 +3,7 @@ package abeja
 import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/higumachan/terraform-abeja-platform/apiclient"
+	"github.com/higumachan/terraform-abeja-platform/terraformschema"
 )
 
 func resourceDeployment() *schema.Resource {
@@ -32,11 +33,11 @@ func resourceDeployment() *schema.Resource {
 func resourceDeploymentCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*apiclient.Client)
 
-	param := apiclient.CreateDeploymentParam{}
 
 	modelId := d.Get("model_id").(string)
-	param.Name = d.Get("name").(string)
-	param.DefaultEnvironment = d.Get("default_environment").(string)
+
+	param := apiclient.CreateDeploymentParam{}
+	terraformschema.Parse(d, &param)
 
 	res, err := client.CreateDeployment(modelId, &param)
 	if err != nil {
